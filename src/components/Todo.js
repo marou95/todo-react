@@ -3,73 +3,105 @@ import Button from "./Button";
 import Dropdown from "./Dropdown";
 import Modal from "./Modal";
 import { ajouterTache, afficherTaches, deleteTask } from "./Api";
+import predefinedTasks from "./predefinedTasks";
 
 const Todo = () => {
   const [currentTask, setCurrentTask] = useState("");
-  const [taskList, setTaskList] = useState([]); // État pour la liste des tâches
-  const [isModalOpen, setModalOpen] = useState(false); // État pour la modal
-  const [taskToDelete, setTaskToDelete] = useState(null); // Tâche à supprimer
-  const [activeDropdown, setActiveDropdown] = useState(null); // État pour gérer l'élément actif
+  const [taskList, setTaskList] = useState([]);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1); // Pour naviguer dans les suggestions
 
-  // Fonction pour gérer l'ouverture/fermeture d'un dropdown
   const toggleDropdown = (index) => {
-    setActiveDropdown((prev) => {
-      if (prev === index) {
-        return null; // Fermer si c'était déjà ouvert
-      } else {
-        return index; // Ouvrir le dropdown cliqué
-      }
-    });
+    setActiveDropdown((prev) => (prev === index ? null : index));
   };
 
-  // Fonction pour ouvrir la modal
   const openModal = (index) => {
     setTaskToDelete(index);
     setModalOpen(true);
-    setActiveDropdown(null); // Fermer toutes les listes déroulantes
-    console.log("Dropdown fermé, activeDropdown:", null);
+    setActiveDropdown(null);
   };
 
-  // Fonction pour fermer la modal
   const closeModal = () => {
     setModalOpen(false);
-    setTaskToDelete(null); // Réinitialiser la tâche à supprimer
+    setTaskToDelete(null);
   };
 
-  const handleKeyDown = async (e) => {
-    if (e.key === "Enter") {
-      onAddTask();
+  const handleInputChange = (e) => {
+    const inputValue = e.target.value;
+    setCurrentTask(inputValue);
+
+    // Générer des suggestions en fonction de la saisie
+    if (inputValue.trim() === "") {
+      setSuggestions([]);
+    } else {
+      const filtered = predefinedTasks.filter((task) =>
+        task.toLowerCase().startsWith(inputValue.toLowerCase())
+      );
+      setSuggestions(filtered);
+      setActiveSuggestionIndex(-1); // Réinitialiser l'index actif
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowDown") {
+      // Naviguer vers le bas dans les suggestions
+      setActiveSuggestionIndex((prevIndex) =>
+        Math.min(prevIndex + 1, suggestions.length - 1)
+      );
+    } else if (e.key === "ArrowUp") {
+      // Naviguer vers le haut dans les suggestions
+      setActiveSuggestionIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    } else if (e.key === "Enter") {
+      if (activeSuggestionIndex >= 0) {
+        // Sélectionner une suggestion avec "Enter"
+        setCurrentTask(suggestions[activeSuggestionIndex]);
+        setSuggestions([]);
+      } else {
+        onAddTask();
+      }
+    } else if (e.key === "Escape") {
+      setSuggestions([]); // Fermer les suggestions
     }
   };
 
   const onAddTask = async () => {
+    if (!currentTask.trim()) return;
+
     try {
       const response = await ajouterTache(currentTask);
       setTaskList([...taskList, response.data]);
       setCurrentTask("");
+      setSuggestions([]);
     } catch (err) {
       console.error("Error adding task:", err);
     }
   };
 
-  // Fonction pour mettre à jour le statut de la tâche
+  const handleSuggestionClick = (suggestion) => {
+    setCurrentTask(suggestion);
+    setSuggestions([]);
+  };
+
   const updateTaskStatus = (index, newStatus) => {
     const updatedTasks = [...taskList];
     updatedTasks[index].status = newStatus;
     setTaskList(updatedTasks);
   };
 
-  // Fonction pour supprimer une tâche
   const handleDeleteTask = async () => {
     if (taskToDelete === null) return;
 
-    const taskId = taskList[taskToDelete]._id; // Récupérer l'ID de la tâche à supprimer
+    const taskId = taskList[taskToDelete]._id;
     try {
-      const response = await deleteTask(taskId); // Appel de la fonction deleteTask
-      console.log(response); // Afficher la réponse du serveur si la suppression réussit
-      const updatedTasks = taskList.filter((_, index) => index !== taskToDelete); // Mettre à jour la liste des tâches
+      await deleteTask(taskId);
+      const updatedTasks = taskList.filter(
+        (_, index) => index !== taskToDelete
+      );
       setTaskList(updatedTasks);
-      closeModal(); // Fermer la modal après suppression
+      closeModal();
     } catch (error) {
       console.error("Failed to delete task:", error);
     }
@@ -89,50 +121,65 @@ const Todo = () => {
 
   return (
     <div style={styles.content}>
+      {/* Input pour ajouter une tâche */}
       <input
         style={styles.input}
         type="text"
-        onKeyDown={handleKeyDown} // Gérer l'événement "Entrée"
-        value={currentTask} // L'input affiche ce qui est stocké dans currentTask
+        value={currentTask}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
         placeholder="Add a task"
-        onChange={(e) => setCurrentTask(e.target.value)} // Mettre à jour l'état
       />
-      {/* Boutton ajout tâche */}
-      <Button
-        label="Add"
-        onClick={onAddTask}
-        style={styles.addButton} // Style personnalisé
-      />
+      {/* Suggestions de tâches */}
+      <div style={styles.suggestionsContainer}>
+        {suggestions.length > 0 && (
+          <ul style={styles.suggestionList}>
+            {suggestions.map((task, index) => (
+              <li
+                key={index}
+                style={{
+                  ...styles.suggestionItem,
+                  backgroundColor:
+                    index === activeSuggestionIndex ? "#e0e0e0" : "#1f1f1f", // Sélection active
+                  color: "#fff", // Couleur du texte
+                }}
+                onMouseDown={() => handleSuggestionClick(task)}
+              >
+                {task}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <Button label="Add" onClick={onAddTask} style={styles.addButton} />
 
       {/* Liste des tâches */}
       <ul style={styles.taskListContainer}>
-  {taskList.map((task, index) => (
-    <li style={styles.taskItem} key={index}>
-      <span style={styles.taskText}>{task.title}</span>
-      {/* Liste déroulante */}
-      <Dropdown
-        items={["Done", "To be done"]}
-        onItemSelected={(newStatus) => updateTaskStatus(index, newStatus)}
-        isOpen={activeDropdown === index} // Le dropdown est ouvert si c'est l'index actif
-        onToggle={() => toggleDropdown(index)} // Gère l'ouverture/fermeture via le parent
-        style={styles.taskStatus}
-      />
-      {/* Bouton Delete */}
-      <Button
-        label="Delete"
-        onClick={() => openModal(index)}
-        style={styles.deleteButton}
-      />
-    </li>
-  ))}
-</ul>
+        {taskList.map((task, index) => (
+          <li style={styles.taskItem} key={index}>
+            <span style={styles.taskText}>{task.title}</span>
+            <Dropdown
+              items={["Done", "To be done"]}
+              onItemSelected={(newStatus) => updateTaskStatus(index, newStatus)}
+              isOpen={activeDropdown === index}
+              onToggle={() => toggleDropdown(index)}
+              style={styles.taskStatus}
+            />
+            <Button
+              label="Delete"
+              onClick={() => openModal(index)}
+              style={styles.deleteButton}
+            />
+          </li>
+        ))}
+      </ul>
 
       {/* Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
         task={taskToDelete !== null ? taskList[taskToDelete]?.title : ""}
-        removeTask={handleDeleteTask} // Utiliser la fonction handleDeleteTask pour supprimer la tâche
+        removeTask={handleDeleteTask}
       />
     </div>
   );
@@ -216,6 +263,30 @@ const styles = {
     display: "inline-block",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  // Parent relatif pour positionner les suggestions
+  suggestionsContainer: {
+    position: "relative", // Nécessaire pour que les suggestions soient positionnées par rapport à l'input
+    width: "100%",
+  },
+  suggestionList: {
+    position: "absolute", // Place la liste sous l'input
+    left: "0",
+    width: "100%", // Correspond à l'input
+    backgroundColor: "rgba(31, 31, 31, 0.5)", // Fond sombre
+    border: "1px solid #444444", // Bordure harmonieuse
+    borderRadius: "5px", // Coins arrondis
+    zIndex: "10", // Toujours visible
+    listStyle: "none", // Supprime les puces par défaut
+    padding: "0", // Aucun padding interne
+    margin: "0", // Aucun margin externe
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)", // Ombre pour un effet visuel
+    overflow: "hidden", // Empêche les débordements
+  },
+  suggestionItem: {
+    padding: "10px 15px", // Espacement interne
+    cursor: "pointer", // Curseur interactif
+    transition: "background-color 0.2s ease", // Animation sur le survol
   },
 };
 
