@@ -1,12 +1,41 @@
 import React, { useEffect, useState } from "react";
 import Button from "./Button";
 import Dropdown from "./Dropdown";
-import { ajouterTache, afficherTaches } from "./Api";
+import Modal from "./Modal";
+import { ajouterTache, afficherTaches, deleteTask } from "./Api";
 
-const Todo = ({openModal}) => {
+const Todo = () => {
   const [currentTask, setCurrentTask] = useState("");
-    const [taskList, setTaskList] = useState([]); // État pour la liste des tâches
-  
+  const [taskList, setTaskList] = useState([]); // État pour la liste des tâches
+  const [isModalOpen, setModalOpen] = useState(false); // État pour la modal
+  const [taskToDelete, setTaskToDelete] = useState(null); // Tâche à supprimer
+  const [activeDropdown, setActiveDropdown] = useState(null); // État pour gérer l'élément actif
+
+  // Fonction pour gérer l'ouverture/fermeture d'un dropdown
+  const toggleDropdown = (index) => {
+    setActiveDropdown((prev) => {
+      if (prev === index) {
+        return null; // Fermer si c'était déjà ouvert
+      } else {
+        return index; // Ouvrir le dropdown cliqué
+      }
+    });
+  };
+
+  // Fonction pour ouvrir la modal
+  const openModal = (index) => {
+    setTaskToDelete(index);
+    setModalOpen(true);
+    setActiveDropdown(null); // Fermer toutes les listes déroulantes
+    console.log("Dropdown fermé, activeDropdown:", null);
+  };
+
+  // Fonction pour fermer la modal
+  const closeModal = () => {
+    setModalOpen(false);
+    setTaskToDelete(null); // Réinitialiser la tâche à supprimer
+  };
+
   const handleKeyDown = async (e) => {
     if (e.key === "Enter") {
       onAddTask();
@@ -15,34 +44,47 @@ const Todo = ({openModal}) => {
 
   const onAddTask = async () => {
     try {
-      const response= await ajouterTache(currentTask);
+      const response = await ajouterTache(currentTask);
       setTaskList([...taskList, response.data]);
       setCurrentTask("");
     } catch (err) {
-      console.log(err);
+      console.error("Error adding task:", err);
     }
   };
 
+  // Fonction pour mettre à jour le statut de la tâche
   const updateTaskStatus = (index, newStatus) => {
     const updatedTasks = [...taskList];
     updatedTasks[index].status = newStatus;
     setTaskList(updatedTasks);
   };
-  // const deleteTask = (index) => {
-  //   const arr = [...taskList];
-  //   arr.splice(index, 1);
-  //   setTaskList(arr);
-  //   closeModal(); // Fermer la modal après suppression
-  // };
+
+  // Fonction pour supprimer une tâche
+  const handleDeleteTask = async () => {
+    if (taskToDelete === null) return;
+
+    const taskId = taskList[taskToDelete]._id; // Récupérer l'ID de la tâche à supprimer
+    try {
+      const response = await deleteTask(taskId); // Appel de la fonction deleteTask
+      console.log(response); // Afficher la réponse du serveur si la suppression réussit
+      const updatedTasks = taskList.filter((_, index) => index !== taskToDelete); // Mettre à jour la liste des tâches
+      setTaskList(updatedTasks);
+      closeModal(); // Fermer la modal après suppression
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchTask = async () => {
+    const fetchTasks = async () => {
       try {
         const result = await afficherTaches();
         setTaskList(result.data);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
     };
-    fetchTask();
+    fetchTasks();
   }, []);
 
   return (
@@ -62,35 +104,36 @@ const Todo = ({openModal}) => {
         style={styles.addButton} // Style personnalisé
       />
 
-      {/* Liste des tache */}
+      {/* Liste des tâches */}
       <ul style={styles.taskListContainer}>
-        {taskList.map((task, index) => (
-          <li style={styles.taskItem} key={index}>
-            {/* Texte de la tâche */}
-            <span style={styles.taskText}>{task.title}</span>
-            {/* Liste déroulante */}
-            <Dropdown
-              items={["Done", "To be done"]}
-              selected={task.status}
-              onItemSelected={(newStatus) => updateTaskStatus(index, newStatus)}
-              style={styles.taskStatus} // Style ajouté pour la liste déroulante
-            />
-            {/* Bouton Delete */}
-            <Button
-              label="Delete"
-              onClick={() => openModal(index)}
-              style={styles.deleteButton} // Style personnalisé
-            />
-          </li>
-        ))}
-      </ul>
-      {/* <Modal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          index={taskToDelete}
-          task={taskToDelete !== null ? taskList[taskToDelete]?.text : ""}
-          removeTask={deleteTask}
-        /> */}
+  {taskList.map((task, index) => (
+    <li style={styles.taskItem} key={index}>
+      <span style={styles.taskText}>{task.title}</span>
+      {/* Liste déroulante */}
+      <Dropdown
+        items={["Done", "To be done"]}
+        onItemSelected={(newStatus) => updateTaskStatus(index, newStatus)}
+        isOpen={activeDropdown === index} // Le dropdown est ouvert si c'est l'index actif
+        onToggle={() => toggleDropdown(index)} // Gère l'ouverture/fermeture via le parent
+        style={styles.taskStatus}
+      />
+      {/* Bouton Delete */}
+      <Button
+        label="Delete"
+        onClick={() => openModal(index)}
+        style={styles.deleteButton}
+      />
+    </li>
+  ))}
+</ul>
+
+      {/* Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        task={taskToDelete !== null ? taskList[taskToDelete]?.title : ""}
+        removeTask={handleDeleteTask} // Utiliser la fonction handleDeleteTask pour supprimer la tâche
+      />
     </div>
   );
 };

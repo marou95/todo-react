@@ -1,27 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import Button from "./Button";
 
-const Dropdown = ({ items, onItemSelected }) => {
-  const [isOpen, setIsOpen] = useState(false); // État pour ouvrir/fermer la liste
-  const [selectedItem, setSelectedItem] = useState(null); // État pour l'élément sélectionné
-
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen); // Ouvrir ou fermer le menu
-  };
-
+const Dropdown = ({ items, onItemSelected, isOpen, onToggle }) => {
   const handleItemClick = (item) => {
-    setSelectedItem(item); // Met à jour l'élément sélectionné
-    onItemSelected(item); // Notifie le parent
-    setIsOpen(false); // Ferme la liste après la sélection
+    onItemSelected(item); // Notifie le parent de l'élément sélectionné
+    onToggle(); // Ferme le dropdown via le parent
   };
 
   return (
     <div style={styles.dropdownContainer}>
+      {/* Bouton principal du dropdown */}
       <Button
-        label={selectedItem || "To be done"} // Affiche l'élément sélectionné ou un message par défaut
-        onClick={toggleDropdown} // Toggle du menu
+        label={items[0] || "To be done"} // Affiche un message par défaut
+        onClick={onToggle} // Toggle géré par le parent
         style={styles.dropdownButton}
       />
+      {/* Liste déroulante */}
       {isOpen && (
         <ul style={styles.dropdownList}>
           {items.map((item, index) => (

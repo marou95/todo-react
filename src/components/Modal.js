@@ -1,6 +1,6 @@
 import React from "react";
 
-const Modal = ({ isOpen, onClose, index, task, removeTask }) => {
+const Modal = ({ isOpen, onClose, task, removeTask }) => {
   if (!isOpen) return null;
 
   return (
@@ -10,20 +10,23 @@ const Modal = ({ isOpen, onClose, index, task, removeTask }) => {
           &times;
         </button>
         <h2 style={styles.header}>Delete task</h2>
-        <p style={styles.message}>Do you really want to delete the task:</p>
+        <p style={styles.message}>Do you really want to delete this task?</p>
         <p style={styles.taskText}>{task}</p>
         <div style={styles.buttonContainer}>
           <button style={styles.cancelButton} onClick={onClose}>
             Cancel
           </button>
-          <button style={styles.deleteButton} onClick={() => removeTask(index)}>
+          <button 
+            style={styles.deleteButton} 
+            onClick={() => removeTask()} // Appeler removeTask pour supprimer la tâche
+          >
             Delete!
           </button>
         </div>
       </div>
     </div>
   );
-};
+};  
 
 const styles = {
   overlay: {

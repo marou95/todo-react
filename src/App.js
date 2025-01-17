@@ -1,31 +1,19 @@
-import React, { useState } from "react";
-import Modal from "./components/Modal";
+import React, {  } from "react";
 import Todo from "./components/Todo";
 import Header from "./components/Header";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login"; // Importation du composant Login
+import Register from "./components/Register";
 
 function App() {
-  const [isModalOpen, setModalOpen] = useState(false); // État pour la modal
-  const [taskToDelete, setTaskToDelete] = useState(null); // Tâche à supprimer
-
-  // Fonction pour ouvrir et fermer la modal
-  const openModal = (index) => {
-    setTaskToDelete(index);
-    setModalOpen(true);
-  };
-  const closeModal = () => {
-    setModalOpen(false);
-    setTaskToDelete(null); // Réinitialiser la tâche à supprimer
-  };
-
   return (
     <Router>
       <div style={styles.body}>
         <Header />
         <Routes>
-          <Route path="/" element={<Todo openModal={openModal} />} />
+          <Route path="/" element={<Todo/>} />
           <Route path="/login" element={<Login />} />{" "}
+          <Route path="/register" element={<Register />} />{" "}
         </Routes>
       </div>
     </Router>

@@ -1,37 +1,74 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Importer useNavigate
+import { useNavigate, useLocation } from "react-router-dom"; // Importer useNavigate
+import axios from "axios";
 
 const Header = () => {
-  const [userToken, setUserToken] = useState();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [userToken, setUserToken] = useState(localStorage.getItem("token")); // Initialiser avec localStorage
   const navigate = useNavigate(); // Initialiser le hook useNavigate
+  const location = useLocation(); // Obtenir l'URL actuelle
+  const isOnRegisterPage =
+    location.pathname === "/register" || location.pathname === "/login"; // Vérifier si on est sur /register
 
   const loginRedirect = () => {
     navigate("/login"); // Rediriger vers la page Login
   };
 
   const disconnect = () => {
-    setUserToken(localStorage.setItem("token", undefined));
+    localStorage.removeItem("token");
+    localStorage.removeItem("name");
+    localStorage.removeItem("email");
+    setUserToken(null); // Réinitialiser le token dans l'état
+    setName(""); // Réinitialiser le nom dans l'état
+    setEmail("");
     navigate("/login"); // Rediriger vers la page Login
   };
 
-
   useEffect(() => {
-    setUserToken(localStorage.getItem("token"));
-  
-  }, [])
-  
+    // Si un token existe, récupérer les informations de l'utilisateur
+    if (userToken) {
+      axios
+        .get("http://localhost:5001/api/users/getInfos", {
+          headers: { Authorization: `Bearer ${userToken}` },
+        })
+        .then((response) => {
+          const name = response.data.name;
+          const email = response.data.email;
+          setName(name); // Mettre à jour le state avec le nom
+          setEmail(email);
+          localStorage.setItem("name", name); // Stocker le nom dans localStorage
+          localStorage.setItem("email", email)
+
+          console.log("API Response:", response.data); // Ajout du log
+        })
+        .catch((err) => {
+          console.error("Failed to fetch user info:", err);
+          disconnect(); // Déconnecter l'utilisateur si le token est invalide
+        });
+    }
+  }, [userToken]);
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.header}>Bienvenue dans votre Todo List Marwen</h1>
-      {userToken === undefined ? (
-        <button style={styles.loginButton} onClick={loginRedirect}>
-          Login - Register
-        </button>
-      ) : (
-        <button style={styles.disconnectButton} onClick={disconnect}>
-          Disconnect
-        </button>
+      <h1 style={styles.header}>Welcome in your Todo list
+      <span style={styles.headerName}> {name} </span>
+      <span  style={styles.userEmail}>{email}</span>
+
+      </h1>
+      {/* Afficher le bouton en fonction du token et de la route */}
+      {!isOnRegisterPage && (
+        <>
+          {userToken === undefined ? (
+            <button style={styles.loginButton} onClick={loginRedirect}>
+              Login - Register
+            </button>
+          ) : (
+            <button style={styles.disconnectButton} onClick={disconnect}>
+              Disconnect
+            </button>
+          )}
+        </>
       )}
     </div>
   );
@@ -56,6 +93,22 @@ const styles = {
     color: "#ffffff",
     flex: 1, // Permet de laisser de la place à droite pour le bouton
   },
+  headerName: {
+      fontSize: "24px",
+      fontWeight: "bold",
+      background: "linear-gradient(90deg, #ff6ec4, #7873f5, #4ade80, #facc15)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      animation: "shine 5s linear infinite",
+      display: "inline-block",
+      marginLeft: "10px",
+      backgroundSize: "200%",
+  },
+  userEmail:{
+    fontSize: "10px",
+    marginLeft: "10px",
+
+  },
   loginButton: {
     backgroundColor: "#007bff",
     color: "#fff",
@@ -77,5 +130,14 @@ const styles = {
     fontSize: "16px",
   },
 };
+// Inline @keyframes animation for the gradient
+const styleSheet = document.styleSheets[0];
+const keyframes = `
+@keyframes shine {
+  0% { background-position: 0%; }
+  100% { background-position: 200%; }
+}
+`;
+styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
 
 export default Header;
