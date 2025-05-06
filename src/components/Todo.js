@@ -4,6 +4,8 @@ import Dropdown from "./Dropdown";
 import Modal from "./Modal";
 import { ajouterTache, afficherTaches, deleteTask } from "./Api";
 import predefinedTasks from "./predefinedTasks";
+import { FiArrowDown } from "react-icons/fi";
+import { TbArrowBigRightLinesFilled } from "react-icons/tb";
 
 const Todo = () => {
   const [currentTask, setCurrentTask] = useState("");
@@ -122,14 +124,18 @@ const Todo = () => {
   return (
     <div style={styles.content}>
       {/* Input pour ajouter une tâche */}
-      <input
-        style={styles.input}
-        type="text"
-        value={currentTask}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        placeholder="Add a task"
-      />
+      <div style={styles.inputContainer}>
+        <input
+          style={styles.input}
+          type="text"
+          value={currentTask}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Add a task"
+        />
+        <TbArrowBigRightLinesFilled label="Add" onClick={onAddTask} style={styles.TbArrowBigRightLinesFilled} />
+        
+      </div>
       {/* Suggestions de tâches */}
       <div style={styles.suggestionsContainer}>
         {suggestions.length > 0 && (
@@ -151,7 +157,6 @@ const Todo = () => {
           </ul>
         )}
       </div>
-      <Button label="Add" onClick={onAddTask} style={styles.addButton} />
 
       {/* Liste des tâches */}
       <ul style={styles.taskListContainer}>
@@ -198,11 +203,16 @@ const styles = {
     maxWidth: "500px",
     padding: "20px",
   },
+  inputContainer: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+  },
   input: {
     backgroundColor: "#333333",
     color: "#ffffff",
-    border: "1px solid #444444",
-    borderRadius: "4px",
+    border: "0px solid #444444",
+    borderRadius: "10px",
     padding: "12px 15px",
     width: "100%",
     marginTop: "20px",
@@ -210,19 +220,15 @@ const styles = {
     fontSize: "18px",
     outline: "none",
   },
-  addButton: {
-    backgroundColor: "#6200ee",
+  TbArrowBigRightLinesFilled: {
+    backgroundColor:"rgb(66, 66, 66)",
+    marginRight:"-30px",
+    padding:"8px",
+    borderRadius:"30%",
+    
     color: "#ffffff",
-    border: "none",
-    borderRadius: "6px",
-    padding: "12px 20px",
     cursor: "pointer",
-    fontSize: "16px",
-    fontWeight: "bold",
-    transition: "background-color 0.3s ease",
-    marginBottom: "20px",
-    width: "auto",
-    alignSelf: "center",
+    transform: "translate(-130%, 0%)"
   },
   taskListContainer: {
     listStyle: "none",

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Importer useNavigate
 import axios from "axios";
+import { TbLogout2 } from "react-icons/tb";
 
 const Header = () => {
   const [name, setName] = useState("");
@@ -38,7 +39,7 @@ const Header = () => {
           setName(name); // Mettre à jour le state avec le nom
           setEmail(email);
           localStorage.setItem("name", name); // Stocker le nom dans localStorage
-          localStorage.setItem("email", email)
+          localStorage.setItem("email", email);
 
           console.log("API Response:", response.data); // Ajout du log
         })
@@ -51,12 +52,12 @@ const Header = () => {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.header}>Welcome in your Todo list
-      <span style={styles.headerName}> {name} </span>
-      <span  style={styles.userEmail}>{email}</span>
-
+      <h1 style={styles.header}>
+        Welcome in your Todo list
+        <span style={styles.headerName}> {name} </span>
       </h1>
       {/* Afficher le bouton en fonction du token et de la route */}
+      <span style={styles.userEmail}>{email}</span>
       {!isOnRegisterPage && (
         <>
           {userToken === undefined ? (
@@ -65,7 +66,7 @@ const Header = () => {
             </button>
           ) : (
             <button style={styles.disconnectButton} onClick={disconnect}>
-              Disconnect
+              <TbLogout2 />
             </button>
           )}
         </>
@@ -94,20 +95,25 @@ const styles = {
     flex: 1, // Permet de laisser de la place à droite pour le bouton
   },
   headerName: {
-      fontSize: "24px",
-      fontWeight: "bold",
-      background: "linear-gradient(90deg, #ff6ec4, #7873f5, #4ade80, #facc15)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-      animation: "shine 5s linear infinite",
-      display: "inline-block",
-      marginLeft: "10px",
-      backgroundSize: "200%",
-  },
-  userEmail:{
-    fontSize: "10px",
+    fontSize: "24px",
+    fontWeight: "bold",
+    // background: "linear-gradient(90deg, #ff6ec4, #7873f5, #4ade80, #facc15)",
+    // WebkitBackgroundClip: "text",
+    // WebkitTextFillColor: "transparent",
+    animation: "shine 5s linear infinite",
+    display: "inline-block",
     marginLeft: "10px",
-
+    backgroundSize: "200%",
+  },
+  userEmail: {
+    padding: "10px",
+    fontSize: "12px",
+    marginLeft: "10px",
+    marginRight: "10px",
+    borderRadius: "5px",
+    backgroundColor: "#2e2e2e",
+    color: "#ffffff",
+    fontWeight: "bold",
   },
   loginButton: {
     backgroundColor: "#007bff",
@@ -122,7 +128,7 @@ const styles = {
   disconnectButton: {
     backgroundColor: "#873232",
     color: "#fff",
-    padding: "10px 20px",
+    padding: "10px 15px",
     marginRight: "10px",
     border: "none",
     cursor: "pointer",
