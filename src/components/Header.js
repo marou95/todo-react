@@ -16,7 +16,7 @@ const Header = () => {
     navigate("/login"); // Rediriger vers la page Login
   };
 
-  const disconnect = () => {
+  const disconnect =React.useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("name");
     localStorage.removeItem("email");
@@ -24,7 +24,7 @@ const Header = () => {
     setName(""); // Réinitialiser le nom dans l'état
     setEmail("");
     navigate("/login"); // Rediriger vers la page Login
-  };
+  }, [navigate]);
 
   useEffect(() => {
     // Si un token existe, récupérer les informations de l'utilisateur
@@ -48,7 +48,7 @@ const Header = () => {
           disconnect(); // Déconnecter l'utilisateur si le token est invalide
         });
     }
-  }, [userToken]);
+  }, [userToken, disconnect]);
 
   return (
     <div style={styles.container}>
