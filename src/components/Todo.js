@@ -4,7 +4,6 @@ import Dropdown from "./Dropdown";
 import Modal from "./Modal";
 import { ajouterTache, afficherTaches, deleteTask } from "./Api";
 import predefinedTasks from "./predefinedTasks";
-import { FiArrowDown } from "react-icons/fi";
 import { TbArrowBigRightLinesFilled } from "react-icons/tb";
 
 const Todo = () => {

@@ -9,7 +9,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const [userToken, setUserToken] = useState();
+  const [, setUserToken] = useState();
 
   const handleRegister = async (e) => {
     e.preventDefault(); // Empêche le rechargement de la page
