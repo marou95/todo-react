@@ -1,5 +1,5 @@
-import React from "react";
-import Button from "./Button";
+import React from 'react';
+import Button from './Button';
 
 const Dropdown = ({ items, onItemSelected, isOpen, onToggle }) => {
   const handleItemClick = (item) => {
@@ -11,7 +11,7 @@ const Dropdown = ({ items, onItemSelected, isOpen, onToggle }) => {
     <div style={styles.dropdownContainer}>
       {/* Bouton principal du dropdown */}
       <Button
-        label={items[0] || "To be done"} // Affiche un message par défaut
+        label={items[1] || "To be done"} // Affiche To be done par défaut
         onClick={onToggle} // Toggle géré par le parent
         style={styles.dropdownButton}
       />
@@ -32,6 +32,7 @@ const Dropdown = ({ items, onItemSelected, isOpen, onToggle }) => {
     </div>
   );
 };
+
 
 const styles = {
   dropdownContainer: {

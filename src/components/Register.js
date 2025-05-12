@@ -20,7 +20,7 @@ const Register = () => {
     }
     try {
       const response = await axios.post(
-        "http://localhost:5001/api/users/register",
+        "https://todo-backend-zi2d.onrender.com/api/users/register",
         {
           name,
           email,
@@ -96,11 +96,12 @@ const Register = () => {
 
 const styles = {
   input: {
+    
     backgroundColor: "#333333",
     color: "#ffffff",
     border: "1px solid #444444",
     borderRadius: "10px",
-    padding: "12px 15px",
+    padding: "12px 10px",
     width: "100%",
     marginTop: "20px",
     marginBottom: "20px",

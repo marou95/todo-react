@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import Button from "./Button";
 import Dropdown from "./Dropdown";
 import Modal from "./Modal";
-import { ajouterTache, afficherTaches, deleteTask } from "./Api";
+import { ajouterTache, afficherTaches, deleteTask, updateTaskStatus } from "./Api";
 import predefinedTasks from "./predefinedTasks";
 import { TbArrowBigRightLinesFilled } from "react-icons/tb";
 
-const Todo = () => {
+function Todo() {
+  const token = localStorage.getItem('token'); // Assurez-vous que le token est stocké dans localStorage
+
   const [currentTask, setCurrentTask] = useState("");
   const [taskList, setTaskList] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -86,10 +88,21 @@ const Todo = () => {
     setSuggestions([]);
   };
 
-  const updateTaskStatus = (index, newStatus) => {
-    const updatedTasks = [...taskList];
-    updatedTasks[index].status = newStatus;
-    setTaskList(updatedTasks);
+  const handleStatusChange = async (index, newStatus) => {
+    try {
+      const task = taskList[index];
+      if (!task || !task._id) {
+        console.error('Task or task._id is undefined');
+        return;
+      }
+      const updatedTask = await updateTaskStatus(task._id, newStatus, token);
+      // Mettre à jour l'état local ou faire d'autres actions nécessaires
+      const updatedTaskList = [...taskList];
+      updatedTaskList[index] = updatedTask;
+      setTaskList(updatedTaskList);
+    } catch (error) {
+      console.error('Failed to update task status:', error);
+    }
   };
 
   const handleDeleteTask = async () => {
@@ -133,7 +146,6 @@ const Todo = () => {
           placeholder="Add a task"
         />
         <TbArrowBigRightLinesFilled label="Add" onClick={onAddTask} style={styles.TbArrowBigRightLinesFilled} />
-        
       </div>
       {/* Suggestions de tâches */}
       <div style={styles.suggestionsContainer}>
@@ -164,7 +176,7 @@ const Todo = () => {
             <span style={styles.taskText}>{task.title}</span>
             <Dropdown
               items={["Done", "To be done"]}
-              onItemSelected={(newStatus) => updateTaskStatus(index, newStatus)}
+              onItemSelected={(newStatus) => handleStatusChange(index, newStatus)}
               isOpen={activeDropdown === index}
               onToggle={() => toggleDropdown(index)}
               style={styles.taskStatus}
@@ -187,7 +199,7 @@ const Todo = () => {
       />
     </div>
   );
-};
+}
 
 // Définition des styles
 const styles = {
@@ -220,11 +232,10 @@ const styles = {
     outline: "none",
   },
   TbArrowBigRightLinesFilled: {
-    backgroundColor:"rgb(66, 66, 66)",
-    marginRight:"-30px",
-    padding:"8px",
-    borderRadius:"30%",
-    
+    backgroundColor: "rgb(66, 66, 66)",
+    marginRight: "-30px",
+    padding: "8px",
+    borderRadius: "30%",
     color: "#ffffff",
     cursor: "pointer",
     transform: "translate(-130%, 0%)"

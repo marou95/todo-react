@@ -16,7 +16,7 @@ const Header = () => {
     navigate("/login"); // Rediriger vers la page Login
   };
 
-  const disconnect =React.useCallback(() => {
+  const disconnect = React.useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("name");
     localStorage.removeItem("email");
@@ -30,7 +30,7 @@ const Header = () => {
     // Si un token existe, récupérer les informations de l'utilisateur
     if (userToken) {
       axios
-        .get("http://localhost:5001/api/users/getInfos", {
+        .get("https://todo-backend-zi2d.onrender.com/api/users/getInfos", {
           headers: { Authorization: `Bearer ${userToken}` },
         })
         .then((response) => {
@@ -57,7 +57,7 @@ const Header = () => {
         <span style={styles.headerName}> {name} </span>
       </h1>
       {/* Afficher le bouton en fonction du token et de la route */}
-      <span style={styles.userEmail}>{email}</span>
+      {userToken === undefined ? (<span style={styles.userEmail}>Please login</span>) : (<span style={styles.userEmail}>{email}</span>)}
       {!isOnRegisterPage && (
         <>
           {userToken === undefined ? (
