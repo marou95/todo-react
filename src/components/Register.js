@@ -1,54 +1,58 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { register } from "./Api";
 
 const Register = () => {
-  const [name, setName] = useState("")
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const [, setUserToken] = useState();
 
   const handleRegister = async (e) => {
     e.preventDefault(); // Empêche le rechargement de la page
 
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords are not matching.");
+      setErrorMessage("Passwords do not match.");
       return;
     }
+
     try {
-      const response = await axios.post(
-        "https://todo-backend-zi2d.onrender.com/api/users/register",
-        {
+      console.log("Sending register request:", { name, email, password }); // Log pour débogage
+      const response = await register({
           name,
           email,
           password,
-        }
-      );
+        });
 
-      // Rediriger l'utilisateur vers une autre page après Register si Success
+      console.log("Register response:", response.data); // Log pour débogage
+
+      // Sauvegarder le token (si le backend le renvoie)
+      const { token } = response.data;
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+
+      // Rediriger vers la page de connexion
       if (response.status === 201) {
+        alert("Registration successful! Please log in.");
         navigate("/login");
       }
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || "An error occurred.");
+      console.error("Register error:", error.response); // Log pour débogage
+      setErrorMessage(error.response?.data?.message || "An error occurred during registration.");
     }
-  };
-
-  const createAccount = () => {
-    setUserToken(localStorage.setItem("token", undefined));
-    // navigate("/register"); // Rediriger vers la page register
   };
 
   return (
     <div style={styles.container}>
-      <h2>Login</h2>
+      <h2>Register</h2>
       <form onSubmit={handleRegister} style={styles.form}>
         {errorMessage && <p style={styles.error}>{errorMessage}</p>}
         <input
-          type="name"
+          type="text" // Corrigé de type="name"
           placeholder="Enter your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -79,17 +83,13 @@ const Register = () => {
           style={styles.input}
           required
         />
-        {/* {errorMessage && <p style={styles.error}>{errorMessage}</p>} */}
-
-        <button
-          type="submit"
-          style={styles.registerButton}
-          onClick={createAccount}
-        >
-          Create My account
+        <button type="submit" style={styles.registerButton}>
+          Create My Account
         </button>
       </form>
-      <a href="/login">Log in</a>
+      <p>
+        <a href="/login">Log in</a>
+      </p>
     </div>
   );
 };

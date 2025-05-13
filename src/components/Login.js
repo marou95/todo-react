@@ -1,31 +1,32 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { login } from "./Api.js"; // Assurez-vous que le chemin est correct
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate()
 
   const handleLogin = async (e) => {
     e.preventDefault(); // Empêche le rechargement de la page
     try {
-      const response = await axios.post(
-        "https://todo-backend-zi2d.onrender.com/api/users/login",
-        {
-          email,
-          password,
-        }
-      );
-      const { token } = response.data;
+      console.log("Sending login request:", { email, password }); // Log pour débogage
+      const response = await login({
+        email,
+        password,
+      });
 
-      // Sauvegarder le token dans le stockage local (localStorage)
+      const { token } = response.data;
       localStorage.setItem("token", token);
       console.log(`Welcome, ${email}!`);
 
-      // Rediriger l'utilisateur vers une autre page après login (par ex. la Todo List)
-      window.location.href = "/";
+      // Rediriger vers la page d'accueil
+      navigate("/");
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || "An error occurred.");
+      console.error("Login error:", error.response);
+      setErrorMessage(error.response?.data?.message || "An error occurred during login.");
     }
   };
 

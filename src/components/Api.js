@@ -1,76 +1,88 @@
 import axios from "axios";
 
-const ajouterTache = async (currentTask) => {
-  if (currentTask.trim() === "") return;
+// Créer une instance Axios avec l'URL de base
+const api = axios.create({
+  baseURL: "https://todo-backend-zi2d.onrender.com",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
+// Intercepteur pour ajouter le token JWT à toutes les requêtes
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token && token !== "undefined") {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Fonction pour l'inscription
+const register = async (data) => {
   try {
-    const token = localStorage.getItem("token");
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    const response = await axios.post("https://todo-backend-zi2d.onrender.com/api/tasks",{ title: currentTask },config);
+    const response = await api.post("/api/users/register", data);
     return response;
   } catch (error) {
-    console.error("Erreur lors de l'ajout de la tâche :", error);
+    console.error("Erreur lors de l'inscription :", error.response?.data || error.message);
+    throw error;
   }
 };
 
-const afficherTaches = async () => {
+// Fonction pour la connexion
+const login = async (data) => {
   try {
-    const token = localStorage.getItem("token");
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    const response = await axios.get("https://todo-backend-zi2d.onrender.com/api/tasks", config);
+    const response = await api.post("/api/users/login", data);
     return response;
   } catch (error) {
-    console.error("Erreur lors de la récuperation de(s) tâche(s) :", error);
+    console.error("Erreur lors de la connexion :", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Ajouter une tâche
+const ajouterTache = async (currentTask) => {
+  if (currentTask.trim() === "") return null;
+
+  try {
+    const response = await api.post("/api/tasks", { title: currentTask });
+    return response;
+  } catch (error) {
+    console.error("Erreur lors de l'ajout de la tâche :", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Afficher les tâches
+const afficherTaches = async () => {
+  try {
+    const response = await api.get("/api/tasks");
+    return response;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de(s) tâche(s) :", error.response?.data || error.message);
+    throw error;
   }
 };
 
 // Supprimer une tâche
 const deleteTask = async (taskId) => {
   try {
-    const token = localStorage.getItem("token");
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    const response = await axios.delete(`https://todo-backend-zi2d.onrender.com/api/tasks/${taskId}`,config);
-    return response.data; // Retourne la réponse en cas de succès
-  } catch (error) {
-    console.error("Error deleting task:", error.response?.data || error.message);
-    throw error; // Propager l'erreur pour la gérer côté frontend
-  }
-};
-
-const API_BASE_URL = 'https://todo-backend-zi2d.onrender.com/api/tasks';
-
-const updateTaskStatus = async (taskId, newStatus, token) => {
-  try {
-    const response = await axios.patch(
-      `${API_BASE_URL}/${taskId}/status`,
-      { status: newStatus },
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await api.delete(`/api/tasks/${taskId}`);
     return response.data;
   } catch (error) {
-    console.error('Error updating task status:', error);
+    console.error("Erreur lors de la suppression de la tâche :", error.response?.data || error.message);
     throw error;
   }
 };
 
+// Mettre à jour le statut d'une tâche
+const updateTaskStatus = async (taskId, newStatus) => {
+  try {
+    const response = await api.patch(`/api/tasks/${taskId}/status`, { status: newStatus });
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du statut de la tâche :", error.response?.data || error.message);
+    throw error;
+  }
+};
 
-
-export { ajouterTache, afficherTaches, deleteTask, updateTaskStatus};
+export { register, login, ajouterTache, afficherTaches, deleteTask, updateTaskStatus };
