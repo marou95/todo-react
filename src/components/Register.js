@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link} from "react-router-dom";
 import { register } from "./Api";
 
 const Register = () => {
@@ -87,7 +87,7 @@ const Register = () => {
         </button>
       </form>
       <p>
-        <a href="/login">Log in</a>
+        <Link to="/login">Log in</Link>
       </p>
     </div>
   );

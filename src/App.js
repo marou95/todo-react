@@ -1,19 +1,21 @@
 import React, {  } from "react";
 import Todo from "./components/Todo";
 import Header from "./components/Header";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Login from "./components/Login"; // Importation du composant Login
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import Login from "./components/Login";
 import Register from "./components/Register";
 
 function App() {
   return (
-    <Router>
+<Router>
       <div style={styles.body}>
         <Header />
         <Routes>
-          <Route path="/" element={<Todo/>} />
-          <Route path="/login" element={<Login />} />{" "}
-          <Route path="/register" element={<Register />} />{" "}
+          <Route path="/" element={<Todo />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          {/* Redirection par défaut vers /login si l'URL est inconnue */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>
     </Router>

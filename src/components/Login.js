@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { login } from "./Api.js"; // Assurez-vous que le chemin est correct
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -54,7 +54,7 @@ const Login = () => {
           Login
         </button>
         <p>
-          <a href="/register">Create an account.</a>
+        <Link to="/register">Create an account</Link>
         </p>
       </form>
     </div>
