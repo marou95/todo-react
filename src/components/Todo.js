@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Button from "./Button";
 import Dropdown from "./Dropdown";
 import Modal from "./Modal";
 import { ajouterTache, afficherTaches, deleteTask, updateTaskStatus } from "./Api";
 import predefinedTasks from "./predefinedTasks";
 import { TbArrowBigRightLinesFilled } from "react-icons/tb";
+import { UserContext } from './UserContext'; // Importer le contexte utilisateur
+import { useNavigate } from 'react-router-dom';
 
 function Todo() {
-  const token = localStorage.getItem('token'); // Assurez-vous que le token est stocké dans localStorage
+  // const token = localStorage.getItem('token'); // Assurez-vous que le token est stocké dans localStorage
+  const { user, token } = useContext(UserContext); // Importer le contexte utilisateur
 
   const [currentTask, setCurrentTask] = useState("");
   const [taskList, setTaskList] = useState([]);
@@ -16,6 +19,7 @@ function Todo() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1); // Pour naviguer dans les suggestions
+  const navigate = useNavigate(); // Initialiser le hook useNavigate
 
   const toggleDropdown = (index) => {
     setActiveDropdown((prev) => (prev === index ? null : index));
@@ -123,15 +127,25 @@ function Todo() {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      try {
-        const result = await afficherTaches();
-        setTaskList(result.data);
+      // Vérifier si le token est présent sinon rediriger vers la page de connexion
+      if (!user.token) {
+        navigate('/login', { replace: true });
+        return;
+      }
+try {
+        const response = await afficherTaches();
+        setTaskList(response.data);
       } catch (error) {
-        console.error("Error fetching tasks:", error);
+        console.error('Failed to fetch tasks:', error);
+        // TO DO
+        // setError('Failed to load tasks. Please try again.');
+        if (error.response?.status === 401) {
+          navigate('/login', { replace: true });
+        }
       }
     };
     fetchTasks();
-  }, []);
+  }, [user.token, navigate]);
 
   return (
     <div style={styles.content}>

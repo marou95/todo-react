@@ -1,25 +1,26 @@
-import React, { useState } from "react";
-import { login } from "./Api.js"; // Assurez-vous que le chemin est correct
+import React, { useState, useContext } from "react";
+import { apiLogin } from "./Api.js"; // Assurez-vous que le chemin est correct
 import { useNavigate, Link } from "react-router-dom";
+import { UserContext } from './UserContext'; // Importer le contexte utilisateur
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const { login } = useContext(UserContext); // Importer le contexte utilisateur
   const navigate = useNavigate()
 
   const handleLogin = async (e) => {
     e.preventDefault(); // Empêche le rechargement de la page
     try {
       console.log("Sending login request:", { email, password }); // Log pour débogage
-      const response = await login({
+      const response = await apiLogin({
         email,
         password,
       });
 
       const { token } = response.data;
-      localStorage.setItem("token", token);
-      console.log(`Welcome, ${email}!`);
+      login(token); // Mettre à jour le contexte
 
       // Rediriger vers la page d'accueil
       navigate("/");
@@ -54,7 +55,7 @@ const Login = () => {
           Login
         </button>
         <p>
-        <Link to="/register">Create an account</Link>
+          <Link to="/register">Create an account</Link>
         </p>
       </form>
     </div>

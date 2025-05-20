@@ -1,13 +1,16 @@
-import React, {  } from "react";
+import React, { } from "react";
 import Todo from "./components/Todo";
 import Header from "./components/Header";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import { UserProvider } from './components/UserContext';
 
 function App() {
+
   return (
-<Router>
+    <UserProvider>
+    <Router>
       <div style={styles.body}>
         <Header />
         <Routes>
@@ -19,6 +22,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </UserProvider>
   );
 }
 

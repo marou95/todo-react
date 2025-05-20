@@ -29,7 +29,7 @@ const register = async (data) => {
 };
 
 // Fonction pour la connexion
-const login = async (data) => {
+const apiLogin = async (data) => {
   try {
     const response = await api.post("/api/users/login", data);
     return response;
@@ -85,4 +85,4 @@ const updateTaskStatus = async (taskId, newStatus) => {
   }
 };
 
-export { register, login, ajouterTache, afficherTaches, deleteTask, updateTaskStatus };
+export { register, apiLogin, ajouterTache, afficherTaches, deleteTask, updateTaskStatus };
