@@ -1,17 +1,21 @@
 import React, { useState, useContext } from "react";
-import { apiLogin } from "./Api.js"; // Assurez-vous que le chemin est correct
+import { apiLogin } from "./Api.js";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from './UserContext'; // Importer le contexte utilisateur
+import { ClipLoader } from 'react-spinners';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const { login } = useContext(UserContext); // Importer le contexte utilisateur
+  const [isLoading, setIsLoading] = useState(false); // État pour le chargement
   const navigate = useNavigate()
 
   const handleLogin = async (e) => {
     e.preventDefault(); // Empêche le rechargement de la page
+    setIsLoading(true); // Activer le spinner
+    setErrorMessage("");
     try {
       console.log("Sending login request:", { email, password }); // Log pour débogage
       const response = await apiLogin({
@@ -27,6 +31,8 @@ const Login = () => {
     } catch (error) {
       console.error("Login error:", error.response);
       setErrorMessage(error.response?.data?.message || "An error occurred during login.");
+    } finally {
+      setIsLoading(false); // Désactiver le spinner
     }
   };
 
@@ -42,6 +48,7 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
           style={styles.input}
           required
+          disabled={isLoading} // Désactiver l'input pendant le chargement
         />
         <input
           type="password"
@@ -50,12 +57,22 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           style={styles.input}
           required
+          disabled={isLoading} // Désactiver l'input pendant le chargement
         />
-        <button type="submit" style={styles.loginButton}>
-          Login
+        <button
+          type='submit'
+          style={{ ...styles.loginButton, ...(isLoading ? styles.disabledButton : {}) }}
+          disabled={isLoading} // Désactiver le bouton pendant le chargement
+        >
+
+          {isLoading ? (
+            <ClipLoader size={20} color='#ffffff' /> // Spinner stylisé          
+          ) : (
+            'Login'
+          )}
         </button>
         <p>
-          <Link to="/register">Create an account</Link>
+          <Link to='/register'>Create an account</Link>
         </p>
       </form>
     </div>
@@ -90,6 +107,11 @@ const styles = {
     width: "auto",
     alignSelf: "center",
   },
+  disabledButton: {
+    backgroundColor: '#005bb5',
+    cursor: 'not-allowed',
+  },
+
 };
 
 export default Login;
