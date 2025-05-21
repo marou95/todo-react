@@ -41,19 +41,19 @@ const styles = {
     alignItems: "center",
     overflowY: "auto",
   },
-  header: {
-    textAlign: "center",
-    padding: "20px 0",
-    fontSize: "32px",
-    fontWeight: "bold",
-    color: "#ffffff",
-    backgroundColor: "#1e1e1e",
-    width: "100%",
-    position: "fixed",
-    top: -20,
-    left: 0,
-    zIndex: 10,
-  },
+  // header: {
+  //   textAlign: "center",
+  //   padding: "20px 0",
+  //   fontSize: "32px",
+  //   fontWeight: "bold",
+  //   color: "#ffffff",
+  //   backgroundColor: "#1e1e1e",
+  //   width: "100%",
+  //   position: "fixed",
+  //   top: -20,
+  //   left: 0,
+  //   zIndex: 10,
+  // },
 };
 
 export default App;

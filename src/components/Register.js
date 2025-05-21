@@ -50,7 +50,6 @@ const Register = () => {
 
   return (
     <div style={styles.container}>
-      <h2>Register</h2>
       <form onSubmit={handleRegister} style={styles.form}>
         {errorMessage && <p style={styles.error}>{errorMessage}</p>}
         <input
@@ -88,9 +87,9 @@ const Register = () => {
         {isLoading ? (
           <ClipLoader size={20} color="#ffffff" /> // Spinner stylisé
         ) : (
-        <button type="submit" style={styles.registerButton}>
-          Create My Account
-        </button>
+          <button type="submit" style={styles.registerButton}>
+            Create My Account
+          </button>
         )}
 
       </form>
@@ -102,17 +101,23 @@ const Register = () => {
 };
 
 const styles = {
-  input: {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    height: "75vh",
 
+  },
+  input: {
     backgroundColor: "#333333",
     color: "#ffffff",
     border: "1px solid #444444",
     borderRadius: "10px",
-    padding: "12px 10px",
+    padding: "12px 15px",
     width: "100%",
     marginTop: "20px",
     marginBottom: "20px",
-    fontSize: "18px",
+    fontSize: "16px",
     outline: "none",
   },
 

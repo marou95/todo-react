@@ -37,7 +37,6 @@ const Login = () => {
 
   return (
     <div style={styles.container}>
-      <h2>Login</h2>
       <form onSubmit={handleLogin} style={styles.form}>
         {errorMessage && <p style={styles.error}>{errorMessage}</p>}
         <input
@@ -79,6 +78,17 @@ const Login = () => {
 };
 
 const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#121212",
+    color: "#ffffff",
+    margin: 0,
+    padding: 0,
+    height: "55vh",
+  },
   input: {
     backgroundColor: "#333333",
     color: "#ffffff",
@@ -88,7 +98,7 @@ const styles = {
     width: "100%",
     marginTop: "20px",
     marginBottom: "20px",
-    fontSize: "18px",
+    fontSize: "16px",
     outline: "none",
   },
 

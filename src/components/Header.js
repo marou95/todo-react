@@ -62,7 +62,6 @@ const styles = {
     fontSize: "25px",
     fontWeight: "bold",
     color: "#ffffff",
-    marginLeft: "150px",
     flex: 1, // Permet de laisser de la place à droite pour le bouton
   },
   headerName: {
@@ -85,6 +84,7 @@ const styles = {
     backgroundColor: "#2e2e2e",
     color: "#ffffff",
     fontWeight: "bold",
+    whiteSpace: "nowrap", // Empêcher le débordement
   },
   loginButton: {
     backgroundColor: "#007bff",
@@ -107,13 +107,38 @@ const styles = {
     fontSize: "16px",
   },
 };
-// Inline @keyframes animation for the gradient
+// Media query pour mobile (iPhone 14 Pro Max: ~428px)
 const styleSheet = document.styleSheets[0];
+const mobileStyles = `
+  @media (max-width: 428px) {
+    .header {
+      font-size: 18px; /* Réduire la taille du titre */
+    }
+    .headerName {
+      font-size: 16px; /* Réduire la taille du nom */
+    }
+    .userInfo {
+      flexDirection: column; /* Empiler verticalement */
+      alignItems: center;
+    }
+    .userEmail {
+      font-size: 10px; /* Réduire la taille de l'email */
+      padding: 3px;
+    }
+    .loginButton, .disconnectButton {
+      font-size: 12px; /* Réduire la taille des boutons */
+      padding: 6px 10px;
+    }
+  }
+`;
+styleSheet.insertRule(mobileStyles, styleSheet.cssRules.length);
+
+// Inline @keyframes animation for the gradient
 const keyframes = `
-@keyframes shine {
-  0% { background-position: 0%; }
-  100% { background-position: 200%; }
-}
+  @keyframes shine {
+    0% { background-position: 0%; }
+    100% { background-position: 200%; }
+  }
 `;
 styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
 
