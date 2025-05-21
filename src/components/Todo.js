@@ -11,7 +11,6 @@ import { ClipLoader } from 'react-spinners';
 
 
 function Todo() {
-  // const token = localStorage.getItem('token'); // Assurez-vous que le token est stocké dans localStorage
   const { user, token } = useContext(UserContext); // Importer le contexte utilisateur
 
   const [currentTask, setCurrentTask] = useState("");
@@ -97,7 +96,9 @@ function Todo() {
   };
 
   const handleStatusChange = async (taskId, newStatus) => {
-    // Mise à jour optimiste
+    // On fait une copie de la liste actuelle des tâches pour pouvoir revenir en arrière si nécessaire.
+    // Ensuite, on met à jour immédiatement l'interface utilisateur pour refléter le nouveau statut de la tâche.
+    // Cela donne une impression de rapidité à l'utilisateur, même si la mise à jour sur le serveur n'est pas encore terminée.
     const originalTasks = [...taskList];
     setTaskList((prevTasks) =>
       prevTasks.map((task) =>
@@ -111,7 +112,6 @@ function Todo() {
 
     try {
       await updateTaskStatus(taskId, newStatus);
-      console.log(`Task ${taskId} updated to ${newStatus}`);
     } catch (error) {
       console.error('Failed to update task status:', error);
       setError('Failed to update task status. Please try again.');

@@ -17,7 +17,6 @@ const Login = () => {
     setIsLoading(true); // Activer le spinner
     setErrorMessage("");
     try {
-      console.log("Sending login request:", { email, password }); // Log pour débogage
       const response = await apiLogin({
         email,
         password,

@@ -23,14 +23,11 @@ const Register = () => {
     }
 
     try {
-      console.log("Sending register request:", { name, email, password }); // Log pour débogage
       const response = await register({
         name,
         email,
         password,
       });
-
-      console.log("Register response:", response.data); // Log pour débogage
 
       // Sauvegarder le token (si le backend le renvoie)
       const { token } = response.data;

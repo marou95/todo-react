@@ -20,40 +20,6 @@ const Header = () => {
     navigate('/login');
   };
 
-  // const disconnect = React.useCallback(() => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("name");
-  //   localStorage.removeItem("email");
-  //   setUserToken(null); // Réinitialiser le token dans l'état
-  //   setName(""); // Réinitialiser le nom dans l'état
-  //   setEmail("");
-  //   navigate("/login"); // Rediriger vers la page Login
-  // }, [navigate]);
-
-  // useEffect(() => {
-  //   // Si un token existe, récupérer les informations de l'utilisateur
-  //   if (userToken) {
-  //     axios
-  //       .get("https://todo-backend-zi2d.onrender.com/api/users/getInfos", {
-  //         headers: { Authorization: `Bearer ${userToken}` },
-  //       })
-  //       .then((response) => {
-  //         const name = response.data.name;
-  //         const email = response.data.email;
-  //         setName(name); // Mettre à jour le state avec le nom
-  //         setEmail(email);
-  //         localStorage.setItem("name", name); // Stocker le nom dans localStorage
-  //         localStorage.setItem("email", email);
-
-  //         console.log("API Response:", response.data); // Ajout du log
-  //       })
-  //       .catch((err) => {
-  //         console.error("Failed to fetch user info:", err);
-  //         disconnect(); // Déconnecter l'utilisateur si le token est invalide
-  //       });
-  //   }
-  // }, [userToken, disconnect]);
-
   return (
     <div style={styles.container}>
       <h1 style={styles.header}>
