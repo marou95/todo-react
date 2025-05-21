@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate, Link} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { register } from "./Api";
+import { ClipLoader } from 'react-spinners';
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -9,9 +10,12 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false); // État pour le chargement
+
 
   const handleRegister = async (e) => {
     e.preventDefault(); // Empêche le rechargement de la page
+    setIsLoading(true); // Activer le spinner
 
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
@@ -21,10 +25,10 @@ const Register = () => {
     try {
       console.log("Sending register request:", { name, email, password }); // Log pour débogage
       const response = await register({
-          name,
-          email,
-          password,
-        });
+        name,
+        email,
+        password,
+      });
 
       console.log("Register response:", response.data); // Log pour débogage
 
@@ -42,6 +46,8 @@ const Register = () => {
     } catch (error) {
       console.error("Register error:", error.response); // Log pour débogage
       setErrorMessage(error.response?.data?.message || "An error occurred during registration.");
+    } finally {
+      setIsLoading(false); // Désactiver le spinner
     }
   };
 
@@ -82,9 +88,14 @@ const Register = () => {
           style={styles.input}
           required
         />
+        {isLoading ? (
+          <ClipLoader size={20} color="#ffffff" /> // Spinner stylisé
+        ) : (
         <button type="submit" style={styles.registerButton}>
           Create My Account
         </button>
+        )}
+
       </form>
       <p>
         <Link to="/login">Log in</Link>
@@ -95,7 +106,7 @@ const Register = () => {
 
 const styles = {
   input: {
-    
+
     backgroundColor: "#333333",
     color: "#ffffff",
     border: "1px solid #444444",
