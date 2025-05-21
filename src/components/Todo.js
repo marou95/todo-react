@@ -11,7 +11,7 @@ import { ClipLoader } from 'react-spinners';
 
 
 function Todo() {
-  const { user, token } = useContext(UserContext); // Importer le contexte utilisateur
+  const { user } = useContext(UserContext); // Importer le contexte utilisateur
 
   const [currentTask, setCurrentTask] = useState("");
   const [taskList, setTaskList] = useState([]);
@@ -22,7 +22,6 @@ function Todo() {
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1); // Pour naviguer dans les suggestions
   const navigate = useNavigate(); // Initialiser le hook useNavigate
   const [loadingTasks, setLoadingTasks] = useState({}); // État de chargement par tâche
-  const [error, setError] = useState(null); // Erreur pour l'UI
 
   const toggleDropdown = (index) => {
     setActiveDropdown((prev) => (prev === index ? null : index));
@@ -108,13 +107,11 @@ function Todo() {
 
     // Activer le spinner
     setLoadingTasks((prev) => ({ ...prev, [taskId]: true }));
-    setError(null);
 
     try {
       await updateTaskStatus(taskId, newStatus);
     } catch (error) {
       console.error('Failed to update task status:', error);
-      setError('Failed to update task status. Please try again.');
       // Revenir à l'état précédent
       setTaskList(originalTasks);
     } finally {
@@ -150,8 +147,6 @@ function Todo() {
         setTaskList(response.data);
       } catch (error) {
         console.error('Failed to fetch tasks:', error);
-        // TO DO
-        // setError('Failed to load tasks. Please try again.');
         if (error.response?.status === 401) {
           navigate('/login', { replace: true });
         }
