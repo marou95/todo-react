@@ -7,6 +7,8 @@ import predefinedTasks from "./predefinedTasks";
 import { TbArrowBigRightLinesFilled } from "react-icons/tb";
 import { UserContext } from './UserContext'; // Importer le contexte utilisateur
 import { useNavigate } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners';
+
 
 function Todo() {
   // const token = localStorage.getItem('token'); // Assurez-vous que le token est stocké dans localStorage
@@ -20,6 +22,8 @@ function Todo() {
   const [suggestions, setSuggestions] = useState([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1); // Pour naviguer dans les suggestions
   const navigate = useNavigate(); // Initialiser le hook useNavigate
+  const [loadingTasks, setLoadingTasks] = useState({}); // État de chargement par tâche
+  const [error, setError] = useState(null); // Erreur pour l'UI
 
   const toggleDropdown = (index) => {
     setActiveDropdown((prev) => (prev === index ? null : index));
@@ -92,20 +96,29 @@ function Todo() {
     setSuggestions([]);
   };
 
-  const handleStatusChange = async (index, newStatus) => {
+  const handleStatusChange = async (taskId, newStatus) => {
+    // Mise à jour optimiste
+    const originalTasks = [...taskList];
+    setTaskList((prevTasks) =>
+      prevTasks.map((task) =>
+        task._id === taskId ? { ...task, status: newStatus } : task
+      )
+    );
+
+    // Activer le spinner
+    setLoadingTasks((prev) => ({ ...prev, [taskId]: true }));
+    setError(null);
+
     try {
-      const task = taskList[index];
-      if (!task || !task._id) {
-        console.error('Task or task._id is undefined');
-        return;
-      }
-      const updatedTask = await updateTaskStatus(task._id, newStatus, token);
-      // Mettre à jour l'état local ou faire d'autres actions nécessaires
-      const updatedTaskList = [...taskList];
-      updatedTaskList[index] = updatedTask;
-      setTaskList(updatedTaskList);
+      await updateTaskStatus(taskId, newStatus);
+      console.log(`Task ${taskId} updated to ${newStatus}`);
     } catch (error) {
       console.error('Failed to update task status:', error);
+      setError('Failed to update task status. Please try again.');
+      // Revenir à l'état précédent
+      setTaskList(originalTasks);
+    } finally {
+      setLoadingTasks((prev) => ({ ...prev, [taskId]: false }));
     }
   };
 
@@ -132,7 +145,7 @@ function Todo() {
         navigate('/login', { replace: true });
         return;
       }
-try {
+      try {
         const response = await afficherTaches();
         setTaskList(response.data);
       } catch (error) {
@@ -186,15 +199,20 @@ try {
       {/* Liste des tâches */}
       <ul style={styles.taskListContainer}>
         {taskList.map((task, index) => (
-          <li style={styles.taskItem} key={index}>
+          <li style={styles.taskItem} key={task._id}>
             <span style={styles.taskText}>{task.title}</span>
-            <Dropdown
-              items={["Done", "To be done"]}
-              onItemSelected={(newStatus) => handleStatusChange(index, newStatus)}
-              isOpen={activeDropdown === index}
-              onToggle={() => toggleDropdown(index)}
-              style={styles.taskStatus}
-            />
+            {loadingTasks[task._id] ? (
+              <ClipLoader size={20} color='#ffffff' /> // Spinner stylisé          
+            ) : (
+              <Dropdown
+                items={["Done", "To be done"]}
+                selectedItem={task.status} // Afficher le statut actuel
+                onItemSelected={(newStatus) => handleStatusChange(task._id, newStatus)}
+                isOpen={activeDropdown === task._id}
+                onToggle={() => toggleDropdown(task._id)}
+                style={styles.taskStatus}
+              />
+            )}
             <Button
               label="Delete"
               onClick={() => openModal(index)}

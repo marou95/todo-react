@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from './Button';
 
-const Dropdown = ({ items, onItemSelected, isOpen, onToggle }) => {
+const Dropdown = ({ items, selectedItem, onItemSelected, isOpen, onToggle }) => {
   const handleItemClick = (item) => {
     onItemSelected(item); // Notifie le parent de l'élément sélectionné
     onToggle(); // Ferme le dropdown via le parent
@@ -11,7 +11,7 @@ const Dropdown = ({ items, onItemSelected, isOpen, onToggle }) => {
     <div style={styles.dropdownContainer}>
       {/* Bouton principal du dropdown */}
       <Button
-        label={items[1] || "To be done"} // Affiche To be done par défaut
+        label={selectedItem || items[1] || 'To be done'} // Affiche le statut actuel ou "To be done" par défaut
         onClick={onToggle} // Toggle géré par le parent
         style={styles.dropdownButton}
       />
@@ -43,7 +43,7 @@ const styles = {
   dropdownButton: {
     width: "100%",
     backgroundColor: "grey",
-    opacity:"0.4",
+    opacity: "0.4",
     color: "#ffffff",
     border: "none",
     borderRadius: "3px",
@@ -66,7 +66,7 @@ const styles = {
     padding: 0,
     zIndex: 1000,
   },
-//   texte
+  //   texte
   dropdownItem: {
     padding: "10px",
     color: "#ffffff",
