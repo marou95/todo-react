@@ -5,23 +5,21 @@ import Modal from "./Modal";
 import { ajouterTache, afficherTaches, deleteTask, updateTaskStatus } from "./Api";
 import predefinedTasks from "./predefinedTasks";
 import { TbArrowBigRightLinesFilled } from "react-icons/tb";
-import { UserContext } from './UserContext'; // Importer le contexte utilisateur
+import { UserContext } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 
-
 function Todo() {
-  const { user } = useContext(UserContext); // Importer le contexte utilisateur
-
+  const { user } = useContext(UserContext);
   const [currentTask, setCurrentTask] = useState("");
   const [taskList, setTaskList] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
-  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1); // Pour naviguer dans les suggestions
-  const navigate = useNavigate(); // Initialiser le hook useNavigate
-  const [loadingTasks, setLoadingTasks] = useState({}); // État de chargement par tâche
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const navigate = useNavigate();
+  const [loadingTasks, setLoadingTasks] = useState({});
 
   const toggleDropdown = (index) => {
     setActiveDropdown((prev) => (prev === index ? null : index));
@@ -41,8 +39,6 @@ function Todo() {
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
     setCurrentTask(inputValue);
-
-    // Générer des suggestions en fonction de la saisie
     if (inputValue.trim() === "") {
       setSuggestions([]);
     } else {
@@ -50,35 +46,31 @@ function Todo() {
         task.toLowerCase().startsWith(inputValue.toLowerCase())
       );
       setSuggestions(filtered);
-      setActiveSuggestionIndex(-1); // Réinitialiser l'index actif
+      setActiveSuggestionIndex(-1);
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "ArrowDown") {
-      // Naviguer vers le bas dans les suggestions
       setActiveSuggestionIndex((prevIndex) =>
         Math.min(prevIndex + 1, suggestions.length - 1)
       );
     } else if (e.key === "ArrowUp") {
-      // Naviguer vers le haut dans les suggestions
       setActiveSuggestionIndex((prevIndex) => Math.max(prevIndex - 1, 0));
     } else if (e.key === "Enter") {
       if (activeSuggestionIndex >= 0) {
-        // Sélectionner une suggestion avec "Enter"
         setCurrentTask(suggestions[activeSuggestionIndex]);
         setSuggestions([]);
       } else {
         onAddTask();
       }
     } else if (e.key === "Escape") {
-      setSuggestions([]); // Fermer les suggestions
+      setSuggestions([]);
     }
   };
 
   const onAddTask = async () => {
     if (!currentTask.trim()) return;
-
     try {
       const response = await ajouterTache(currentTask);
       setTaskList([...taskList, response.data]);
@@ -95,24 +87,17 @@ function Todo() {
   };
 
   const handleStatusChange = async (taskId, newStatus) => {
-    // On fait une copie de la liste actuelle des tâches pour pouvoir revenir en arrière si nécessaire.
-    // Ensuite, on met à jour immédiatement l'interface utilisateur pour refléter le nouveau statut de la tâche.
-    // donne une impression de rapidité à l'utilisateur, même si la mise à jour sur le serveur n'est pas encore terminée.
     const originalTasks = [...taskList];
     setTaskList((prevTasks) =>
       prevTasks.map((task) =>
         task._id === taskId ? { ...task, status: newStatus } : task
       )
     );
-
-    // Activer le spinner
     setLoadingTasks((prev) => ({ ...prev, [taskId]: true }));
-
     try {
       await updateTaskStatus(taskId, newStatus);
     } catch (error) {
       console.error('Failed to update task status:', error);
-      // Revenir à l'état précédent
       setTaskList(originalTasks);
     } finally {
       setLoadingTasks((prev) => ({ ...prev, [taskId]: false }));
@@ -121,7 +106,6 @@ function Todo() {
 
   const handleDeleteTask = async () => {
     if (taskToDelete === null) return;
-
     const taskId = taskList[taskToDelete]._id;
     try {
       await deleteTask(taskId);
@@ -137,7 +121,6 @@ function Todo() {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      // Vérifier si le token est présent sinon rediriger vers la page de connexion
       if (!user.token) {
         navigate('/login', { replace: true });
         return;
@@ -157,7 +140,6 @@ function Todo() {
 
   return (
     <div style={styles.content}>
-      {/* Input pour ajouter une tâche */}
       <div style={styles.inputContainer}>
         <input
           style={styles.input}
@@ -167,9 +149,12 @@ function Todo() {
           onKeyDown={handleKeyDown}
           placeholder="Add a task"
         />
-        <TbArrowBigRightLinesFilled label="Add" onClick={onAddTask} style={styles.TbArrowBigRightLinesFilled} />
+        <TbArrowBigRightLinesFilled
+          label="Add"
+          onClick={onAddTask}
+          style={styles.TbArrowBigRightLinesFilled}
+        />
       </div>
-      {/* Suggestions de tâches */}
       <div style={styles.suggestionsContainer}>
         {suggestions.length > 0 && (
           <ul style={styles.suggestionList}>
@@ -179,8 +164,8 @@ function Todo() {
                 style={{
                   ...styles.suggestionItem,
                   backgroundColor:
-                    index === activeSuggestionIndex ? "#e0e0e0" : "#1f1f1f", // Sélection active
-                  color: "#fff", // Couleur du texte
+                    index === activeSuggestionIndex ? "#e0e0e0" : "#1f1f1f",
+                  color: "#fff",
                 }}
                 onMouseDown={() => handleSuggestionClick(task)}
               >
@@ -190,18 +175,22 @@ function Todo() {
           </ul>
         )}
       </div>
-
-      {/* Liste des tâches */}
       <ul style={styles.taskListContainer}>
         {taskList.map((task, index) => (
-          <li style={styles.taskItem} key={task._id}>
+          <li
+            style={{
+              ...styles.taskItem,
+              backgroundColor: task.status === "Done" ? "rgba(74, 222, 128, 0.3)" : "#1f1f1f",
+            }}
+            key={task._id}
+          >
             <span style={styles.taskText}>{task.title}</span>
             {loadingTasks[task._id] ? (
-              <ClipLoader size={20} color='#ffffff' /> // Spinner stylisé          
+              <ClipLoader size={20} color="#ffffff" />
             ) : (
               <Dropdown
                 items={["Done", "To be done"]}
-                selectedItem={task.status} // Afficher le statut actuel
+                selectedItem={task.status}
                 onItemSelected={(newStatus) => handleStatusChange(task._id, newStatus)}
                 isOpen={activeDropdown === task._id}
                 onToggle={() => toggleDropdown(task._id)}
@@ -216,8 +205,6 @@ function Todo() {
           </li>
         ))}
       </ul>
-
-      {/* Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
@@ -228,7 +215,6 @@ function Todo() {
   );
 }
 
-// Définition des styles
 const styles = {
   content: {
     marginTop: "80px",
@@ -239,12 +225,15 @@ const styles = {
     flex: 1,
     width: "100%",
     maxWidth: "500px",
-    padding: "20px",
+    padding: "calc(10px + 2vw)", // Ajouté pour espacement sur mobile
+    boxSizing: "border-box",
   },
   inputContainer: {
     display: "flex",
     alignItems: "center",
     width: "100%",
+    padding: "0 calc(5px + 1vw)", // Ajouté pour espacement interne
+    boxSizing: "border-box",
   },
   input: {
     backgroundColor: "#333333",
@@ -255,8 +244,9 @@ const styles = {
     width: "100%",
     marginTop: "20px",
     marginBottom: "20px",
-    fontSize: "18px",
+    fontSize: "calc(11px + 0.4vw)", // Réduit pour mobile
     outline: "none",
+    boxSizing: "border-box",
   },
   TbArrowBigRightLinesFilled: {
     backgroundColor: "rgb(66, 66, 66)",
@@ -265,32 +255,34 @@ const styles = {
     borderRadius: "30%",
     color: "#ffffff",
     cursor: "pointer",
-    transform: "translate(-130%, 0%)"
+    transform: "translate(-130%, 0%)",
   },
   taskListContainer: {
     listStyle: "none",
-    padding: "0",
+    padding: "0 calc(5px + 1vw)", // Ajouté pour espacement des tâches
     margin: "0",
     width: "100%",
+    boxSizing: "border-box",
   },
   taskItem: {
     backgroundColor: "#1f1f1f",
     padding: "10px 15px",
-    marginBottom: "20px", // Augmenter l'espacement entre les tâches
+    marginBottom: "20px",
     borderRadius: "5px",
     color: "#fff",
-    fontSize: "16px",
+    fontSize: "calc(12px + 0.3vw)", // Réduit pour mobile
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
   },
   taskText: {
-    flex: 1, // Le texte prend tout l'espace disponible
-    marginRight: "3px", // Un peu d'espace entre le texte et la liste déroulante
+    flex: 1,
+    marginRight: "3px",
   },
   taskStatus: {
-    marginRight: "0px", // Espacement entre le statut et le bouton Delete
+    marginRight: "0px",
     width: "5px",
+    fontSize: "calc(10px + 0.4vw)", // Réduit pour mobile
   },
   deleteButton: {
     backgroundColor: "#ff4d4d",
@@ -299,7 +291,7 @@ const styles = {
     borderRadius: "3px",
     padding: "5px 10px",
     cursor: "pointer",
-    fontSize: "14px",
+    fontSize: "12px",
     width: "auto",
     height: "35px",
     marginLeft: "10px",
@@ -307,29 +299,31 @@ const styles = {
     textAlign: "center",
     fontWeight: "bold",
   },
-  // Parent relatif pour positionner les suggestions
   suggestionsContainer: {
-    position: "relative", // Nécessaire pour que les suggestions soient positionnées par rapport à l'input
-    width: "100%",
+    position: "relative",
+    width: "100%", // Corrigé pour correspondre à l’input
+    marginBottom: "20px",
+    // border: "1px solid #444444",
+    borderRadius: "5px",
   },
   suggestionList: {
-    position: "absolute", // Place la liste sous l'input
+    position: "absolute",
     left: "0",
-    width: "100%", // Correspond à l'input
-    backgroundColor: "rgba(31, 31, 31, 0.5)", // Fond sombre
-    border: "1px solid #444444", // Bordure harmonieuse
-    borderRadius: "5px", // Coins arrondis
-    zIndex: "10", // Toujours visible
-    listStyle: "none", // Supprime les puces par défaut
-    padding: "0", // Aucun padding interne
-    margin: "0", // Aucun margin externe
-    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)", // Ombre pour un effet visuel
-    overflow: "hidden", // Empêche les débordements
+    width: "100%",
+    backgroundColor: "rgba(31, 31, 31, 0.5)",
+    border: "1px solid #444444",
+    borderRadius: "5px",
+    zIndex: "10",
+    listStyle: "none",
+    padding: "0",
+    margin: "0",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)",
+    overflow: "hidden",
   },
   suggestionItem: {
-    padding: "10px 15px", // Espacement interne
-    cursor: "pointer", // Curseur interactif
-    transition: "background-color 0.2s ease", // Animation sur le survol
+    padding: "10px 15px",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
   },
 };
 

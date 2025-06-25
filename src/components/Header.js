@@ -70,14 +70,14 @@ const styles = {
   },
   header: {
     textAlign: "center",
-    fontSize: "calc(18px + 0.5vw)", // Réduit de 25px, responsive
+    fontSize: "calc(15px + 0.4vw)", // Réduit de 25px, responsive
     fontWeight: "bold",
     color: "#ffffff",
     flex: 1,
     margin: 0, // Supprime les marges par défaut du h1
   },
   headerName: {
-    fontSize: "calc(16px + 0.4vw)", // Réduit de 24px, responsive
+    fontSize: "calc(15px + 0.4vw)", // Réduit de 24px, responsive
     color: "white",
     fontWeight: "bold",
     textShadow: "0 0 2px white",

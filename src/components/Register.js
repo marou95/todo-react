@@ -102,7 +102,7 @@ const Register = () => {
             )}
           </button>
         )}
-        <Link to="/login">Se connecter</Link>
+        <Link to="/login">Log in</Link>
       </form>
     </div>
   );

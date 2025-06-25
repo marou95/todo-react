@@ -38,7 +38,7 @@ const styles = {
   dropdownContainer: {
     position: "relative",
     display: "inline-block",
-    width: "150px",
+    width: "90px",
   },
   dropdownButton: {
     width: "100%",
@@ -49,7 +49,7 @@ const styles = {
     borderRadius: "3px",
     padding: "10px",
     cursor: "pointer",
-    fontSize: "14px",
+    fontSize: "12px",
     textAlign: "center",
     marginLeft: "5px"
   },
@@ -71,6 +71,9 @@ const styles = {
     padding: "10px",
     color: "#ffffff",
     cursor: "pointer",
+    alignItems: "center",
+    fontSize: "12px",
+    justifyContent: "center",
     backgroundColor: "#1e1e1e",
     borderBottom: "1px solid #333",
   },
