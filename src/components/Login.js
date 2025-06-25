@@ -1,37 +1,31 @@
 import React, { useState, useContext } from "react";
 import { apiLogin } from "./Api.js";
 import { useNavigate, Link } from "react-router-dom";
-import { UserContext } from './UserContext'; // Importer le contexte utilisateur
-import { ClipLoader } from 'react-spinners';
+import { UserContext } from "./UserContext";
+import { ClipLoader } from "react-spinners";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { login } = useContext(UserContext); // Importer le contexte utilisateur
-  const [isLoading, setIsLoading] = useState(false); // État pour le chargement
-  const navigate = useNavigate()
+  const { login } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Empêche le rechargement de la page
-    setIsLoading(true); // Activer le spinner
+    e.preventDefault();
+    setIsLoading(true);
     setErrorMessage("");
     try {
-      const response = await apiLogin({
-        email,
-        password,
-      });
-
+      const response = await apiLogin({ email, password });
       const { token } = response.data;
-      login(token); // Mettre à jour le contexte
-
-      // Rediriger vers la page d'accueil
+      login(token);
       navigate("/");
     } catch (error) {
       console.error("Login error:", error.response);
       setErrorMessage(error.response?.data?.message || "An error occurred during login.");
     } finally {
-      setIsLoading(false); // Désactiver le spinner
+      setIsLoading(false);
     }
   };
 
@@ -46,7 +40,7 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
           style={styles.input}
           required
-          disabled={isLoading} // Désactiver l'input pendant le chargement
+          disabled={isLoading}
         />
         <input
           type="password"
@@ -55,22 +49,17 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           style={styles.input}
           required
-          disabled={isLoading} // Désactiver l'input pendant le chargement
+          disabled={isLoading}
         />
         <button
-          type='submit'
+          type="submit"
           style={{ ...styles.loginButton, ...(isLoading ? styles.disabledButton : {}) }}
-          disabled={isLoading} // Désactiver le bouton pendant le chargement
+          disabled={isLoading}
         >
-
-          {isLoading ? (
-            <ClipLoader size={20} color='#ffffff' /> // Spinner stylisé          
-          ) : (
-            'Login'
-          )}
+          {isLoading ? <ClipLoader size={20} color="#ffffff" /> : "Login"}
         </button>
         <p>
-          <Link to='/register'>Create an account</Link>
+          <Link to="/register">Create an account</Link>
         </p>
       </form>
     </div>
@@ -80,47 +69,58 @@ const Login = () => {
 const styles = {
   container: {
     display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#121212",
+    minHeight: "calc(80vh - 80px)", // Adjust for assumed header height
+    padding: "20px",
+    boxSizing: "border-box",
+    backgroundColor: "#121212", 
     color: "#ffffff",
-    margin: 0,
-    padding: 0,
-    height: "55vh",
+  },
+  form: {
+    width: "100%",
+    maxWidth: "400px",
+    padding: "20px",
+    boxSizing: "border-box",
+    flexDirection: "column",
+    alignItems: "center",
   },
   input: {
+    width: "100%",
     backgroundColor: "#333333",
     color: "#ffffff",
     border: "1px solid #444444",
     borderRadius: "10px",
-    padding: "12px 15px",
-    width: "100%",
-    marginTop: "20px",
+    padding: "calc(10px + 0.5vw)", // Responsive padding
     marginBottom: "20px",
-    fontSize: "16px",
+    fontSize: "calc(14px + 0.2vw)", // Responsive font size
     outline: "none",
+    boxSizing: "border-box",
   },
-
   loginButton: {
     backgroundColor: "#6200ee",
     color: "#ffffff",
     border: "none",
     borderRadius: "6px",
-    padding: "12px 20px",
+    padding: "10px", // Responsive padding
     cursor: "pointer",
-    fontSize: "16px",
+    fontSize: "calc(14px + 0.2vw)", // Responsive font size
     fontWeight: "bold",
     transition: "background-color 0.3s ease",
-    marginBottom: "20px",
-    width: "auto",
+    width: "100%",
     alignSelf: "center",
+    marginBottom: "10px",
   },
   disabledButton: {
-    backgroundColor: '#005bb5',
-    cursor: 'not-allowed',
+    backgroundColor: "#005bb5",
+    cursor: "not-allowed",
   },
-
+  error: {
+    color: "red",
+    fontSize: "14px",
+    marginBottom: "10px",
+    textAlign: "center",
+  },
 };
 
 export default Login;

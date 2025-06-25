@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { register } from "./Api";
-import { ClipLoader } from 'react-spinners';
+import { ClipLoader } from "react-spinners";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -10,41 +10,37 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false); // État pour le chargement
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
 
   const handleRegister = async (e) => {
-    e.preventDefault(); // Empêche le rechargement de la page
-    setIsLoading(true); // Activer le spinner
+    e.preventDefault();
+    setIsLoading(true);
 
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
+      setIsLoading(false);
+      setIsRegistrationSuccess(false);
       return;
     }
 
     try {
-      const response = await register({
-        name,
-        email,
-        password,
-      });
-
-      // Sauvegarder le token (si le backend le renvoie)
+      const response = await register({ name, email, password });
       const { token } = response.data;
       if (token) {
         localStorage.setItem("token", token);
       }
-
-      // Rediriger vers la page de connexion
       if (response.status === 201) {
-        alert("Registration successful! Please log in.");
-        navigate("/login");
+        setIsRegistrationSuccess(true);
+        setTimeout(() => {
+          navigate("/login");
+        }, 5000); // 5 secondes
       }
     } catch (error) {
-      console.error("Register error:", error.response); // Log pour débogage
+      console.error("Register error:", error.response);
       setErrorMessage(error.response?.data?.message || "An error occurred during registration.");
     } finally {
-      setIsLoading(false); // Désactiver le spinner
+      setIsLoading(false);
     }
   };
 
@@ -53,12 +49,13 @@ const Register = () => {
       <form onSubmit={handleRegister} style={styles.form}>
         {errorMessage && <p style={styles.error}>{errorMessage}</p>}
         <input
-          type="text" // Corrigé de type="name"
+          type="text"
           placeholder="Enter your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={styles.input}
           required
+          disabled={isLoading} // Désactiver les inputs pendant le chargement
         />
         <input
           type="email"
@@ -67,6 +64,7 @@ const Register = () => {
           onChange={(e) => setEmail(e.target.value)}
           style={styles.input}
           required
+          disabled={isLoading}
         />
         <input
           type="password"
@@ -75,6 +73,7 @@ const Register = () => {
           onChange={(e) => setPassword(e.target.value)}
           style={styles.input}
           required
+          disabled={isLoading}
         />
         <input
           type="password"
@@ -83,19 +82,28 @@ const Register = () => {
           onChange={(e) => setConfirmPassword(e.target.value)}
           style={styles.input}
           required
+          disabled={isLoading}
         />
-        {isLoading ? (
-          <ClipLoader size={20} color="#ffffff" /> // Spinner stylisé
+        {isRegistrationSuccess ? (
+          <p style={styles.successMessage}>Inscription réussie !</p>
         ) : (
-          <button type="submit" style={styles.registerButton}>
-            Create My Account
+          <button
+            type="submit"
+            style={{
+              ...styles.registerButton,
+              ...(isLoading ? styles.disabledButton : {}),
+            }}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ClipLoader size={20} color="#ffffff" />
+            ) : (
+              "Create My Account"
+            )}
           </button>
         )}
-
+        <Link to="/login">Se connecter</Link>
       </form>
-      <p>
-        <Link to="/login">Log in</Link>
-      </p>
     </div>
   );
 };
@@ -103,46 +111,56 @@ const Register = () => {
 const styles = {
   container: {
     display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
-    height: "75vh",
-
+    alignItems: "center",
+    minHeight: "calc(80vh)", // Adjust for assumed header height
+    padding: "20px",
+    boxSizing: "border-box",
+  },
+  form: {
+    width: "100%",
+    maxWidth: "500px",
+    padding: "20px",
+    boxSizing: "border-box",
+    alignItems: "center",
   },
   input: {
+    width: "100%",
     backgroundColor: "#333333",
     color: "#ffffff",
     border: "1px solid #444444",
     borderRadius: "10px",
-    padding: "12px 15px",
-    width: "100%",
-    marginTop: "20px",
+    padding: "calc(10px + 0.5vw)", // Slightly responsive padding
     marginBottom: "20px",
-    fontSize: "16px",
+    fontSize: "calc(14px + 0.2vw)", // Slightly responsive font size
     outline: "none",
+    boxSizing: "border-box",
   },
-
   registerButton: {
     backgroundColor: "#6200ee",
     color: "#ffffff",
     border: "none",
     borderRadius: "6px",
-    padding: "12px 20px",
+    padding: "calc(10px + 0vw) 20px", // Responsive padding
     cursor: "pointer",
-    fontSize: "16px",
+    fontSize: "calc(14px + 0.2vw)", // Responsive font size
     fontWeight: "bold",
     transition: "background-color 0.3s ease",
-    marginBottom: "20px",
-    width: "auto",
+    width: "100%",
     alignSelf: "center",
+    marginBottom: "20px",
   },
   error: {
     color: "red",
     fontSize: "14px",
     marginBottom: "10px",
-  },
-  title: {
     textAlign: "center",
-    marginBottom: "20px",
+  },
+  successMessage: {
+    color: "green",
+    fontSize: "16px",
+    marginBottom: "10px",
+    textAlign: "center",
   },
 };
 
