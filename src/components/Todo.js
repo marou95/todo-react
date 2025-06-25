@@ -97,7 +97,7 @@ function Todo() {
   const handleStatusChange = async (taskId, newStatus) => {
     // On fait une copie de la liste actuelle des tâches pour pouvoir revenir en arrière si nécessaire.
     // Ensuite, on met à jour immédiatement l'interface utilisateur pour refléter le nouveau statut de la tâche.
-    // Cela donne une impression de rapidité à l'utilisateur, même si la mise à jour sur le serveur n'est pas encore terminée.
+    // donne une impression de rapidité à l'utilisateur, même si la mise à jour sur le serveur n'est pas encore terminée.
     const originalTasks = [...taskList];
     setTaskList((prevTasks) =>
       prevTasks.map((task) =>

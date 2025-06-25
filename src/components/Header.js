@@ -1,33 +1,42 @@
 import { useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { TbLogout2 } from "react-icons/tb";
-import { UserContext } from './UserContext'; // Importer le contexte utilisateur
+import { UserContext } from "./UserContext";
 
 const Header = () => {
-  const { user, logout } = useContext(UserContext); // Utiliser le contexte utilisateur
-  const navigate = useNavigate(); // Initialiser le hook useNavigate
-  const location = useLocation(); // Obtenir l'URL actuelle
+  const { user, logout } = useContext(UserContext);
+  const navigate = useNavigate();
+  const location = useLocation();
   const isOnRegisterPage =
-    location.pathname === "/register" || location.pathname === "/login"; // Vérifier si on est sur /register
+    location.pathname === "/register" || location.pathname === "/login";
 
   const loginRedirect = () => {
     logout();
-    navigate("/login"); // Rediriger vers la page Login
+    navigate("/login");
   };
 
   const disconnect = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
+  // Première lettre en majuscule
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return ""; // Gérer les cas où str est vide ou undefined
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+  
   return (
     <div style={styles.container}>
       <h1 style={styles.header}>
-        Welcome in your Todo list
-        <span style={styles.headerName}> {user.name} </span>
+        Welcome In Your Todo List
+        <span style={styles.headerName}> {capitalizeFirstLetter(user.name)} </span>
       </h1>
-      {/* Afficher le bouton en fonction du token et de la route */}
-      {user.token === undefined ? (<span style={styles.userEmail}>Please login</span>) : (<span style={styles.userEmail}>{user.email}</span>)}
+      {user.token === undefined ? (
+        <span style={styles.userEmail}>Please login</span>
+      ) : (
+        <span style={styles.userEmail}>{user.email}</span>
+      )}
       {!isOnRegisterPage && (
         <>
           {user.token === undefined ? (
@@ -48,98 +57,64 @@ const Header = () => {
 const styles = {
   container: {
     display: "flex",
-    justifyContent: "space-between", // Place les éléments aux extrémités
-    alignItems: "center", // Aligne verticalement
+    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: "#1e1e1e",
     width: "100%",
     position: "fixed",
     top: 0,
     left: 0,
     zIndex: 10,
+    padding: "10px 20px", // Ajouté pour un espacement interne
+    boxSizing: "border-box",
   },
   header: {
     textAlign: "center",
-    fontSize: "25px",
+    fontSize: "calc(18px + 0.5vw)", // Réduit de 25px, responsive
     fontWeight: "bold",
     color: "#ffffff",
-    flex: 1, // Permet de laisser de la place à droite pour le bouton
+    flex: 1,
+    margin: 0, // Supprime les marges par défaut du h1
   },
   headerName: {
-    fontSize: "24px italic",
+    fontSize: "calc(16px + 0.4vw)", // Réduit de 24px, responsive
+    color: "white",
     fontWeight: "bold",
-    // background: "linear-gradient(90deg, #ff6ec4, #7873f5, #4ade80, #facc15)",
-    // WebkitBackgroundClip: "text",
-    // WebkitTextFillColor: "transparent",
-    animation: "shine 5s linear infinite",
+    textShadow: "0 0 2px white",
     display: "inline-block",
     marginLeft: "10px",
     backgroundSize: "200%",
   },
   userEmail: {
-    padding: "10px",
-    fontSize: "12px",
+    padding: "calc(6px + 0.2vw)", // Réduit de 10px, responsive
+    fontSize: "calc(10px + 0.2vw)", // Réduit de 12px, responsive
     marginLeft: "10px",
     marginRight: "10px",
     borderRadius: "5px",
     backgroundColor: "#2e2e2e",
     color: "#ffffff",
     fontWeight: "bold",
-    whiteSpace: "nowrap", // Empêcher le débordement
+    whiteSpace: "nowrap",
   },
   loginButton: {
     backgroundColor: "#007bff",
     color: "#fff",
-    padding: "10px 20px",
+    padding: "calc(6px + 0.2vw) 15px", // Réduit de 10px/20px, responsive
     marginRight: "10px",
     border: "none",
     cursor: "pointer",
     borderRadius: "5px",
-    fontSize: "16px",
+    fontSize: "calc(12px + 0.2vw)", // Réduit de 16px, responsive
   },
   disconnectButton: {
     backgroundColor: "#873232",
     color: "#fff",
-    padding: "10px 15px",
-    marginRight: "10px",
+    padding: "calc(6px + 0.2vw) 10px", // Réduit de 10px/15px, responsive
+    marginRight: "0px",
     border: "none",
     cursor: "pointer",
     borderRadius: "5px",
-    fontSize: "16px",
+    fontSize: "calc(12px + 0.2vw)", // Réduit de 16px, responsive
   },
 };
-// Media query pour mobile (iPhone 14 Pro Max: ~428px)
-const styleSheet = document.styleSheets[0];
-const mobileStyles = `
-  @media (max-width: 428px) {
-    .header {
-      font-size: 18px; /* Réduire la taille du titre */
-    }
-    .headerName {
-      font-size: 16px; /* Réduire la taille du nom */
-    }
-    .userInfo {
-      flexDirection: column; /* Empiler verticalement */
-      alignItems: center;
-    }
-    .userEmail {
-      font-size: 10px; /* Réduire la taille de l'email */
-      padding: 3px;
-    }
-    .loginButton, .disconnectButton {
-      font-size: 12px; /* Réduire la taille des boutons */
-      padding: 6px 10px;
-    }
-  }
-`;
-styleSheet.insertRule(mobileStyles, styleSheet.cssRules.length);
-
-// Inline @keyframes animation for the gradient
-const keyframes = `
-  @keyframes shine {
-    0% { background-position: 0%; }
-    100% { background-position: 200%; }
-  }
-`;
-styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
-
 export default Header;

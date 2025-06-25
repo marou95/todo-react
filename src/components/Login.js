@@ -71,7 +71,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "calc(80vh - 80px)", // Adjust for assumed header height
+    minHeight: "calc(80vh - 80px)",
     padding: "20px",
     boxSizing: "border-box",
     backgroundColor: "#121212", 
@@ -91,9 +91,9 @@ const styles = {
     color: "#ffffff",
     border: "1px solid #444444",
     borderRadius: "10px",
-    padding: "calc(10px + 0.5vw)", // Responsive padding
+    padding: "calc(10px + 0.5vw)",
     marginBottom: "20px",
-    fontSize: "calc(14px + 0.2vw)", // Responsive font size
+    fontSize: "calc(14px + 0.2vw)",
     outline: "none",
     boxSizing: "border-box",
   },
@@ -102,9 +102,9 @@ const styles = {
     color: "#ffffff",
     border: "none",
     borderRadius: "6px",
-    padding: "10px", // Responsive padding
+    padding: "10px",
     cursor: "pointer",
-    fontSize: "calc(14px + 0.2vw)", // Responsive font size
+    fontSize: "calc(14px + 0.2vw)",
     fontWeight: "bold",
     transition: "background-color 0.3s ease",
     width: "100%",
