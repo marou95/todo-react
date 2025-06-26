@@ -4,7 +4,6 @@ import Dropdown from "./Dropdown";
 import Modal from "./Modal";
 import { ajouterTache, afficherTaches, deleteTask, updateTaskStatus } from "./Api";
 import predefinedTasks from "./predefinedTasks";
-import { TbArrowBigRightLinesFilled } from "react-icons/tb";
 import { TiPlus } from "react-icons/ti";
 
 import { UserContext } from './UserContext';
