@@ -176,7 +176,7 @@ function Todo() {
         )}
       </div>
       <ul style={styles.taskListContainer}>
-        {taskList.map((task, index) => (
+        {taskList.sort((a, b) => (a.status === "Done" ? 1 : b.status === "Done" ? -1 : 0)).map((task, index) => (
           <li
             style={{
               ...styles.taskItem,
