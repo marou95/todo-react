@@ -5,6 +5,8 @@ import Modal from "./Modal";
 import { ajouterTache, afficherTaches, deleteTask, updateTaskStatus } from "./Api";
 import predefinedTasks from "./predefinedTasks";
 import { TbArrowBigRightLinesFilled } from "react-icons/tb";
+import { TiPlus } from "react-icons/ti";
+
 import { UserContext } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
@@ -149,10 +151,10 @@ function Todo() {
           onKeyDown={handleKeyDown}
           placeholder="Add a task"
         />
-        <TbArrowBigRightLinesFilled
+        <TiPlus
           label="Add"
           onClick={onAddTask}
-          style={styles.TbArrowBigRightLinesFilled}
+          style={styles.TiPlus}
         />
       </div>
       <div style={styles.suggestionsContainer}>
@@ -248,7 +250,7 @@ const styles = {
     outline: "none",
     boxSizing: "border-box",
   },
-  TbArrowBigRightLinesFilled: {
+  TiPlus: {
     backgroundColor: "rgb(66, 66, 66)",
     marginRight: "-30px",
     padding: "8px",
