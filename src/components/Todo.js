@@ -185,7 +185,12 @@ function Todo() {
             }}
             key={task._id}
           >
-            <span style={styles.taskText}>{task.title}</span>
+                        {
+              task.status === "Done" ?
+                <span style={{...styles.taskText, textDecoration: "line-through", color: "#888888" }}>{task.title}</span>
+                :
+                <span style={{...styles.taskText, color: "#ffffff" }}>{task.title}</span>
+            }
             {loadingTasks[task._id] ? (
               <ClipLoader size={20} color="#ffffff" />
             ) : (
